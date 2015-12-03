@@ -7,11 +7,12 @@ Simply:
 ```
 docker-compose up -d
 ```
-#### Enviroment variables
+#### Environment variables
 Set:
-````- NEO4J_PASS
+```
+- NEO4J_PASS
 - NEO4J_USER
-````
+```
 ### WebService
 The web service exposes the following methods:
 
