@@ -1,0 +1,18 @@
+local:
+  image: wemeep/wemeep-users-service
+  ports:
+    - "8080:8080"
+
+neo4j:
+  image: neo4j
+  restart: always
+  privileged: true
+  volumes:
+    - ./../../neo4j/data:/data
+  ports:
+    - "80:7474"
+  environment:
+    - NEO4J_USER
+    - NEO4J_PASS
+  cap_add:
+    - SYS_RESOURCE

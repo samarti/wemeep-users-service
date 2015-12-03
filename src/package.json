@@ -1,0 +1,7 @@
+{
+  "name": "docker-centos-notification-service",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Users service for the WeMeep application",
+  "author": "Santiago Marti <samarti@uc.cl>",
+}
