@@ -4,7 +4,7 @@ local:
     - "8080:8080"
   container_name: usersservice
   external_links:
-    - usersservice:db
+    - db:usersservice
 
 neo4j:
   image: neo4j
