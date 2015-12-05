@@ -13,5 +13,6 @@ RUN cd /src; npm install
 COPY . /src
 
 EXPOSE 8080
-RUN npm install neo4j@1.1.1 --save
+RUN npm install neo4j --save
+RUN npm install --save body-parser
 CMD ["node", "/src/index.js"]

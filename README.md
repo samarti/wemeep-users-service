@@ -16,24 +16,43 @@ Set:
 ### WebService
 The web service exposes the following methods:
 
-- Get a user followers with `GET` at
+- Create a user with `POST` at
+
 ```
-http://host:8080/user/{id}/followers
+http://host:8080/users/
+
+Data: { body: { username:<someUsername>, email:<someEmail>, ... } }
+Returns the user id registration was successful
+```
+- Get a user with `GET` at
+
+```
+http://host:8080/users?id=<someId>
+
+Returns the user data
+```
+- Get a user followers with `GET` at
+
+```
+http://host:8080/users/{id}/followers
 ```
 - Get a user followees with `GET` at
+
 ```
-http://host:8080/user/{id}/followees
+http://host:8080/users/{id}/followees
 ```
 - Add a follower with `POST` at
+
 ```
-http://host:8080/user/{id}/followers
+http://host:8080/users/{id}/followers
 
 Data: { body: { id:<someUserId> } }
 ```
 
 - Remove a follower with `DELETE` at
+
 ```
-http://host:8080/user/{id}/followers
+http://host:8080/users/{id}/followers
 
 Data: { body: { id:<someUserId> } }
 ```
@@ -48,6 +67,7 @@ Data: { body: { id:<someUserId> } }
 | password | String |
 | twitterId | Number|
 | facebookId | Number |
+| gcmId | String |
 | public | Boolean |
 | picture | URL |
 | updatedAt | Timestamp |
