@@ -86,3 +86,7 @@ Data: { body: { id:<someUserId> } }
 | picture | URL |
 | updatedAt | Timestamp |
 | createdAt | Timestamp |
+
+## TODO
+- Add authentication to the database
+- Use a separate Docker Hub container for the DB

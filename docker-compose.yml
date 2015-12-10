@@ -1,23 +1,30 @@
 local:
-  image: wemeep/wemeep-users-service
+#  image: wemeep/wemeep-users-service
+  image: usersservice
   ports:
     - "8080:8080"
-  container_name: usersservice
-  external_links:
-    - db:usersservice
+  links:
+    - mongo:db
 
-neo4j:
-  image: neo4j
+mongo:
+  image: mongo:latest
   restart: always
   privileged: true
   container_name: db
   volumes:
-    - ./../../neo4j/data:/data
+    - ./mongo/data:/data
   ports:
-    - "7474:7474"
+    - "27017:27017"
+    - "28017:28017"
   environment:
-    - NEO4J_USER
-    - NEO4J_PASS
+    - MONGO_USER
+    - MONGO_PASS
   cap_add:
     - SYS_RESOURCE
-  #command: curl --verbose --show-error  -H \"Content-Type:application/json\" -X POST -d '{\"statements\":[ {\"statement\":\"CREATE CONSTRAINT ON (book:Book) ASSERT book.isbn IS UNIQUE\" } ]}' http://127.0.0.1:7474/db/data/transaction/commit
+
+mongogui:
+  image: aegypius/genghis
+  ports:
+    - "5000:5000"
+  links:
+    - mongo:db

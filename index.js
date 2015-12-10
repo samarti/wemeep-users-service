@@ -2,10 +2,21 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+var MongoClient = require('mongodb').MongoClient
+  , assert = require('assert');
+var url = 'mongodb://192.168.99.100:27017/local';
 var PORT = 8080;
+var theDb;
+var usersCollection;
 
-var neo4j = require('neo4j');
-var db = new neo4j.GraphDatabase('http://neo4j:wemeep@db:7474');
+MongoClient.connect(url, function(err, db) {
+  // Create a capped collection with a maximum of 1000 documents
+  theDb = db;
+  theDb.createCollection("users", {capped:true, size:10000, max:1000, w:1}, function(err, collection) {
+    console.log("Users collection created")
+    usersCollection = collection;
+  });
+});
 
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -54,25 +65,15 @@ function validEmail(email){
 }
 
 function saveUser(res, data){
-  db.cypher({
-    query: 'CREATE (n:User { username: \"' + data["username"] + '\"' +
-                ', email: \"' + data["email"] + '\"' +
-                 ', facebookId: \"' + data["facebookId"] + '\"' +
-                 ', password: \"' + data["password"] + '\"' +
-                 ', twitterId: \"' + data["twitterId"] + '\"' +
-                 ', picture: \"' + data["epicturemail"] + '\"' +
-                 ', gcmId: \"' + data["gcmId"] + '\"' +
-                 '}) return ID(n)',
-  }, function callback(err, results) {
-      if (err) throw err;
-      var result = results[0];
-      if (!result) {
-          console.log('No user found.');
-          throwJsonResponse(res, "Error", "Unknown error");
-      } else {
-          var id = result['id'];
-          throwJsonResponse(res, "Success", JSON.stringify(results));
-      }
+  usersCollection.bulkWrite( [ {insertOne : {document :{"username":data["username"]
+                  , "email":data["email"]
+                  , "password":data["password"]
+                  , "twitterId":data["twitterId"]
+                  , "facebookId":data["facebookId"]
+                  , "picture":data["picture"]
+                  , "gcmId":data["gcmId"]} } } ] , 
+                  {ordered:true, w:1}, function(err, r) {
+    return res.json({"id":JSON.parse(JSON.stringify(r.insertedIds))['0']});
   });
 }
 
@@ -101,5 +102,5 @@ app.delete('/users/:id/followees', function(req, res){
 });
 
 function throwJsonResponse(res, type, message){
-  return res.json({type:message});
+  return res.json({id:message});
 }
