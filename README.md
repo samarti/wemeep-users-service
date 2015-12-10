@@ -10,9 +10,15 @@ docker-compose up -d
 #### Environment variables
 Set:
 ```
-- NEO4J_PASS
-- NEO4J_USER
 ```
+
+#### Exposed ports
+```
+- API: 8080
+- DB: 27017, 28017
+- Genghis: 5000
+```
+
 ### WebService
 The web service exposes the following methods:
 
@@ -27,7 +33,7 @@ Returns the user id registration was successful
 - Get a user with `GET` at
 
 ```
-http://host:8080/users?id=<someId>
+http://host:8080/users/{id}
 
 Returns the user data
 ```
@@ -89,4 +95,5 @@ Data: { body: { id:<someUserId> } }
 
 ## TODO
 - Add authentication to the database
-- Use a separate Docker Hub container for the DB
+- Protect the API
+- Check for SQLInjection
