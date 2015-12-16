@@ -245,8 +245,7 @@ function areCredentialsValid(res, username, password){
 
 function generateToken(res, username, password, deviceid){
   usersCollection.findOne( {"username":username}, function(err, user) {
-    console.log(user.password);
-    console.log(hashPassword(user.salt, password));
+    console.log(sessionServiceUrl);
     if(user === null)
       res.json({"Error":"User not found"});
     else if(user.password !== hashPassword(user.salt, password)){
