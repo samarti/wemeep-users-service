@@ -10,6 +10,7 @@ docker-compose up -d
 #### Environment variables
 Set:
 ```
+- SESSION_SERVICE_URL
 ```
 
 #### Exposed ports
@@ -28,7 +29,7 @@ The web service exposes the following methods:
 http://host:8080/users/
 
 Data: { body: { username:<someUsername>, email:<someEmail>, ... } }
-Returns the user id registration was successful
+Returns the user id if registration was successful
 ```
 - Get a user with `GET` at
 
@@ -65,6 +66,22 @@ Data: { body: { id:<someUserId> } }
 ### Data model
 #### Objects
 ##### User
+|  Field      |  Values   |
+| :---------- | :-------- |
+| sender      | String    |
+| message     | String    |
+| id          | Number    |
+| type        | String    |
+| receipts    | Number    |
+| facebookId  | Number    |
+| public      | Boolean   |
+| isRoot      | Boolean   |
+| picture     | URL       |
+| updatedAt   | Timestamp |
+| createdAt   | Timestamp |
+| comments    | Array<Meep> |
+
+##### User
 |Field   |Values   |
 |---|---|
 | username  | String  |
@@ -74,24 +91,13 @@ Data: { body: { id:<someUserId> } }
 | twitterId | Number|
 | facebookId | Number |
 | gcmId | String |
-| public | Boolean |
+| isPublic | Boolean |
 | picture | URL |
+| salt | String |
 | updatedAt | Timestamp |
 | createdAt | Timestamp |
-##### Meep
-|Field   |Values   |
-|---|---|
-| sender  | String  |
-| message  | String  |
-| id  | Number  |
-| type | String |
-| receipts | Number|
-| facebookId | Number |
-| public | Boolean |
-| isRoot | Boolean |
-| picture | URL |
-| updatedAt | Timestamp |
-| createdAt | Timestamp |
+| followers    | Array<User> |
+| followees    | Array<User> |
 
 ## TODO
 - Add authentication to the database

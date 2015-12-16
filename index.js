@@ -5,6 +5,13 @@ var app = express();
 var bodyParser = require('body-parser');
 var MongoClient = require('mongodb').MongoClient
   , assert = require('assert');
+var bcrypt = require('bcrypt');
+var request = require("request");
+var querystring = require('querystring');
+var http = require('http');
+var fs = require('fs');
+
+var sessionServiceUrl = process.env.SESSION_SERVICE_URL;
 var url = 'mongodb://db:27017/local';
 var PORT = 8080;
 var theDb;
@@ -14,7 +21,7 @@ MongoClient.connect(url, function(err, db) {
   // Create a capped collection with a maximum of 1000 documents
   theDb = db;
   theDb.createCollection("users", {w:1}, function(err, collection) {
-    console.log("Users collection created")
+    console.log("Users collection created");
     usersCollection = collection;
   });
 });
@@ -34,7 +41,7 @@ app.post('/users/', function(req, res){
   var data = {
     "username":req.body.username ,
     "email": req.body.email,
-    "password":req.body.password ,
+    "password":req.body.password,
     "twitterId":req.body.twitterId ,
     "facebookId":req.body.facebookId ,
     "picture": req.body.picture,
@@ -77,6 +84,16 @@ app.delete('/users/:id/followees', function(req, res){
   removeFollowee(res, req.params.id, req.body.id);
 });
 
+//Validates user credentials for the Session Service
+app.post('/users/validate', function(req, res){
+  areCredentialsValid(res, req.body.username, req.body.password);
+});
+
+//Logs in a user using the Session Service
+app.post('/users/login', function(req, res){
+  generateToken(res, req.body.username, req.body.password, req.body.deviceid);
+});
+
 function usernameExists(username){
     return false;
 }
@@ -90,14 +107,16 @@ function validEmail(email){
 }
 
 function saveUser(res, data){
+  var salt = bcrypt.genSaltSync(10);
   usersCollection.bulkWrite( [ {insertOne : {document :{
                     "username":data["username"]
                   , "email":data["email"]
-                  , "password":data["password"]
+                  , "password":hashPassword(salt, data["password"])
                   , "twitterId":data["twitterId"]
                   , "facebookId":data["facebookId"]
                   , "picture":data["picture"]
                   , "gcmId":data["gcmId"]
+                  , "salt":salt
                   , "followees":[]
                   , "followers":[]} } } ] ,
                   {ordered:true, w:1}, function(err, r) {
@@ -108,7 +127,7 @@ function saveUser(res, data){
 function getUser(res, id){
   try {
     var objID = ObjectID.createFromHexString(id);
-    usersCollection.findOne( {"_id":objID}, { fields:{"password":0} }, function(err, item) {
+    usersCollection.findOne( {"_id":objID}, { fields:{"password":0, "salt":0} }, function(err, item) {
       if(item === null)
         res.json({"Error":"User not found"});
       else {
@@ -209,6 +228,56 @@ function removeFollowee(res, idUser, idFollowee){
   } catch (err){
     res.json({"Error":err.toString()});
   }
+}
+
+function areCredentialsValid(res, username, password){
+  usersCollection.findOne( {"username":username}, function(err, user) {
+    if(user === null)
+      res.json({"Error":"User not found"});
+    else {
+      if(hashPassword(user.salt, password) === user.password)
+        res.json({"response":"success"});
+      else
+        res.json({"response":"failed"});
+    }
+  });
+}
+
+function generateToken(res, username, password, deviceid){
+  usersCollection.findOne( {"username":username}, function(err, user) {
+    console.log(user.password);
+    console.log(hashPassword(user.salt, password));
+    if(user === null)
+      res.json({"Error":"User not found"});
+    else if(user.password !== hashPassword(user.salt, password)){
+      res.json({"Error":"Wrong password"});
+    } else {
+      var post_data = {};
+      post_data.userId = user["_id"];
+      post_data.username = username;
+      post_data.deviceId = deviceid;
+
+      request({
+        uri: sessionServiceUrl,
+        method: "POST",
+        timeout: 10000,
+        followRedirect: true,
+        maxRedirects: 10,
+        json: post_data,
+        body: post_data
+      }, function(error, response, body) {
+        if(error === null)
+          res.json({"token":body["token"]});
+        else
+          res.json({"response":error});
+      });
+    }
+  });
+}
+
+function hashPassword(salt, password){
+  var hash = bcrypt.hashSync(password, salt);
+  return hash;
 }
 
 function throwJsonResponse(res, type, message){
