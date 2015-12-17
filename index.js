@@ -89,7 +89,7 @@ app.post('/users/validate', function(req, res){
   areCredentialsValid(res, req.body.username, req.body.password);
 });
 
-//Logs in a user using the Session Service
+//Logs in a user using the Session Service and returns a token
 app.post('/users/login', function(req, res){
   generateToken(res, req.body.username, req.body.password, req.body.deviceid);
 });

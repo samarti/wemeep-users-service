@@ -56,12 +56,40 @@ http://host:8080/users/{id}/followers
 Data: { body: { id:<someUserId> } }
 ```
 
-- Remove a follower with `DELETE` at
+- Remove a followee with `DELETE` at
 
 ```
-http://host:8080/users/{id}/followers
+http://host:8080/users/{id}/followees
 
 Data: { body: { id:<someUserId> } }
+```
+
+- Remove a followee with `DELETE` at
+
+```
+http://host:8080/users/{id}/followees
+
+Data: { body: { id:<someUserId> } }
+```
+
+- Login a User with `POST` at
+
+```
+http://host:8080/users/login
+
+Data: { body: { username:<someUsername>, email:<someEmail>, ... }}
+
+Returns a token or an error
+```
+
+- Validate a User credentials with `POST`
+
+```
+http://host:8080/users/validate
+
+Data: { body: { username:<someUsername>, email:<someEmail>, ... }}
+
+Returns true or false
 ```
 ### Data model
 #### Objects
