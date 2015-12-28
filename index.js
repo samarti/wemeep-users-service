@@ -96,7 +96,7 @@ app.post('/users/validate', function(req, res){
 //Logs in a user using the Session Service and returns a token
 app.post('/users/login', function(req, res){
   generateToken(res, req.body.username, req.body.password, req.body.deviceid);
-}); 
+});
 
 function saveUser(res, data){
   var salt = bcrypt.genSaltSync(10);
@@ -259,7 +259,7 @@ function generateToken(res, username, password, deviceid){
         if(error === null)
           res.json({"token":body["token"]});
         else
-          res.json({"response":error});
+          res.json({"Error":error});
       });
     }
   });
