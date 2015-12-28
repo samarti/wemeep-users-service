@@ -93,28 +93,13 @@ Returns true or false
 ```
 ### Data model
 #### Objects
-##### User
-|  Field      |  Values   |
-| :---------- | :-------- |
-| sender      | String    |
-| message     | String    |
-| id          | Number    |
-| type        | String    |
-| receipts    | Number    |
-| facebookId  | Number    |
-| public      | Boolean   |
-| isRoot      | Boolean   |
-| picture     | URL       |
-| updatedAt   | Timestamp |
-| createdAt   | Timestamp |
-| comments    | Array<Meep> |
 
 ##### User
 |Field   |Values   |
 |---|---|
 | username  | String  |
 | email  | String  |
-| id  | Number  |
+| id  | String  |
 | password | String |
 | twitterId | Number|
 | facebookId | Number |
