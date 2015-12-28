@@ -2,6 +2,8 @@
 logs
 *.log
 
+docker-compose.yml
+
 # Runtime data
 pids
 *.pid

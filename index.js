@@ -12,7 +12,9 @@ var http = require('http');
 var fs = require('fs');
 
 var sessionServiceUrl = process.env.SESSION_SERVICE_URL;
+//var sessionServiceUrl = "http://ec2-54-233-116-227.sa-east-1.compute.amazonaws.com:4567/generatetoken"
 var url = 'mongodb://db:27017/local';
+//var url = 'mongodb://192.168.99.100:27017/local'
 var PORT = 8080;
 var theDb;
 var usersCollection;
@@ -48,22 +50,24 @@ app.post('/users/', function(req, res){
     "gcmId":req.body.gcmId
   }
 
-  if(usernameExists(data["username"])){
-    throwJsonResponse(res, "Error", "Username exists");
-  }
-  if(emailExists(data["email"])){
-    throwJsonResponse(res, "Error", "Email exists");
-  }
-  if(!validEmail(data["username"])){
-    throwJsonResponse(res, "Error", "Invalid email");
-  }
-  saveUser(res, data);
+  usersCollection.findOne( {username:req.body.username}, { fields:{"password":0, "salt":0} }, function(err, item) {
+    if(item === null){
+      usersCollection.findOne( {email:req.body.email}, { fields:{"password":0, "salt":0} }, function(err, item) {
+        if(item === null)
+          saveUser(res, data);
+        else
+          res.json({"Error":"Email exists"});
+      });
+    } else
+      res.json({"Error":"Username exists"});
+  });
 });
 
 //Get a user with `GET` at
 app.get('/users/:id', function(req, res){
   getUser(res, req.params.id);
 });
+
 //Get a user followers with `GET` at
 app.get('/users/:id/followers', function(req, res){
   getFollowers(res, req.params.id);
@@ -93,18 +97,6 @@ app.post('/users/validate', function(req, res){
 app.post('/users/login', function(req, res){
   generateToken(res, req.body.username, req.body.password, req.body.deviceid);
 });
-
-function usernameExists(username){
-    return false;
-}
-
-function emailExists(email){
-  return false;
-}
-
-function validEmail(email){
-  return true;
-}
 
 function saveUser(res, data){
   var salt = bcrypt.genSaltSync(10);
@@ -236,16 +228,15 @@ function areCredentialsValid(res, username, password){
       res.json({"Error":"User not found"});
     else {
       if(hashPassword(user.salt, password) === user.password)
-        res.json({"response":"success"});
+        res.json({"id":user["_id"]});
       else
-        res.json({"response":"failed"});
+        res.json({"Error":"Bad credentials"});
     }
   });
 }
 
 function generateToken(res, username, password, deviceid){
   usersCollection.findOne( {"username":username}, function(err, user) {
-    console.log(sessionServiceUrl);
     if(user === null)
       res.json({"Error":"User not found"});
     else if(user.password !== hashPassword(user.salt, password)){
