@@ -13,8 +13,8 @@ var fs = require('fs');
 
 var sessionServiceUrl = process.env.SESSION_SERVICE_URL;
 //var sessionServiceUrl = "http://ec2-54-233-116-227.sa-east-1.compute.amazonaws.com:4567/generatetoken"
-//var url = 'mongodb://ec2-54-233-116-255.sa-east-1.compute.amazonaws.com:27017/local';
-var url = 'mongodb://192.168.99.100:27017/local'
+var url = 'mongodb://db:27017/local';
+//var url = 'mongodb://192.168.99.100:27017/local'
 var PORT = 8080;
 var theDb;
 var usersCollection;
