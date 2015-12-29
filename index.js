@@ -38,6 +38,10 @@ app.get('/', function(req, res){
 });
 app.listen(PORT);
 
+app.get('/searchuser', function(req, res){
+  res.send("WeMeep User Service. If you are reading this, we suck at securing API's.");
+});
+
 //Create a user with `POST` at
 app.post('/users/', function(req, res){
   var data = {
@@ -130,6 +134,21 @@ function getUser(res, id){
     res.json({"Error":"Invalid parameters"});
   }
 }
+
+function getUser(res, username){
+  usersCollection.findOne({"username":{$regex: /^username/i}}, function(err, user) {
+    if(user === null)
+      res.json({"Error":"User not found"});
+    else {
+      if(hashPassword(user.salt, password) === user.password)
+        res.json({"id":user["_id"]});
+      else
+        res.json({"Error":"Bad credentials"});
+    }
+  });
+}
+
+
 
 function getFollowers(res, id){
   try {
