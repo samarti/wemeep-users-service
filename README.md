@@ -82,6 +82,13 @@ Data: { body: { username:<someUsername>, email:<someEmail>, ... }}
 
 Returns true or false
 ```
+- Search for users starting with something with `GET`
+
+```
+http://host:8080/searchuser?username=<someString>
+
+Returns an array with the found users starting with <someString>
+```
 ### Data model
 #### Objects
 
