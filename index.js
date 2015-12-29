@@ -34,7 +34,7 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 }));
 
 app.get('/', function(req, res){
-  res.send("WeMeep User Service. If you are reading this, we suck at securing API's.");
+  searchUser(res, req.params.username);
 });
 app.listen(PORT);
 
@@ -135,20 +135,18 @@ function getUser(res, id){
   }
 }
 
-function getUser(res, username){
+function searchUser(res, username){
   usersCollection.findOne({"username":{$regex: /^username/i}}, function(err, user) {
     if(user === null)
       res.json({"Error":"User not found"});
     else {
       if(hashPassword(user.salt, password) === user.password)
-        res.json({"id":user["_id"]});
+        res.json({"id":user["_id"], "username":user["username"]});
       else
-        res.json({"Error":"Bad credentials"});
+        res.json({"Error":"Not found"});
     }
   });
 }
-
-
 
 function getFollowers(res, id){
   try {
