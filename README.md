@@ -48,15 +48,7 @@ http://host:8080/users/{id}/followers
 ```
 http://host:8080/users/{id}/followees
 ```
-- Add a follower with `POST` at
-
-```
-http://host:8080/users/{id}/followers
-
-Data: { body: { id:<someUserId> } }
-```
-
-- Remove a followee with `DELETE` at
+- Add a followee with `POST` at
 
 ```
 http://host:8080/users/{id}/followees
@@ -71,7 +63,6 @@ http://host:8080/users/{id}/followees
 
 Data: { body: { id:<someUserId> } }
 ```
-
 - Login a User with `POST` at
 
 ```
