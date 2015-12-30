@@ -38,6 +38,13 @@ http://host:8080/users/{id}
 
 Returns the user data
 ```
+- Delete a user with `DELETE` at
+
+```
+http://host:8080/users/{id}
+
+Returns Success or Error
+```
 - Get a user followers with `GET` at
 
 ```

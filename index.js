@@ -38,7 +38,7 @@ app.get('/searchuser', function(req, res){
 });
 app.listen(PORT);
 
-app.get('/searchuser', function(req, res){
+app.get('/', function(req, res){
   res.send("WeMeep User Service. If you are reading this, we suck at securing API's.");
 });
 
@@ -75,6 +75,11 @@ app.get('/users/:id', function(req, res){
 //Get a user followers with `GET` at
 app.get('/users/:id/followers', function(req, res){
   getFollowers(res, req.params.id);
+});
+
+//Delete a user
+app.delete('/users/:id', function(req, res){
+  deleteUser(res, req.params.id);
 });
 
 //Get a user followees with `GET` at
@@ -133,6 +138,17 @@ function getUser(res, id){
   } catch (err){
     res.json({"Error":"Invalid parameters"});
   }
+}
+
+function deleteUser(res, id){
+  var objID = ObjectID.createFromHexString(id);
+  usersCollection.deleteOne( {"_id":objID}, function(err, results) {
+    if(err !== null)
+      res.json({"Error":err.toString()});
+    else {
+      res.json({"Success":results.toString()});
+    }
+  });
 }
 
 function searchUser(res, username){
