@@ -89,7 +89,7 @@ app.get('/users/:id/followees', function(req, res){
 
 //Update a following relation
 app.put('/users/:id/followees', function(req, res){
-  var type = req.params.type;
+  var type = req.body.type;
   if(type === "add")
     addFollowee(res, req.params.id, req.body.id);
   else if (type === "remove")
