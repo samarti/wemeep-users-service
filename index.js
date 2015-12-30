@@ -128,7 +128,7 @@ function saveUser(res, data){
 function getUser(res, id){
   try {
     var objID = ObjectID.createFromHexString(id);
-    usersCollection.findOne( {"_id":objID}, { fields:{"password":0, "salt":0, "followess": 0, "followers": 0} }, function(err, item) {
+    usersCollection.findOne( {"_id":objID}, { fields:{"password":0, "salt":0, "followees": 0, "followers": 0} }, function(err, item) {
       if(item === null)
         res.json({"Error":"User not found"});
       else {
