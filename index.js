@@ -87,14 +87,14 @@ app.get('/users/:id/followees', function(req, res){
   getFollowees(res, req.params.id);
 });
 
-//Add a followee with `POST` at
-app.post('/users/:id/followees', function(req, res){
-  addFollowee(res, req.params.id, req.body.id);
-});
-
-//Remove a followee with `DELETE` at
-app.delete('/users/:id/followees', function(req, res){
-  removeFollowee(res, req.params.id, req.body.id);
+//Update a following relation
+app.put('/users/:id/followees', function(req, res){
+  var type = req.params.type;
+  if(type === "add")
+    addFollowee(res, req.params.id, req.body.id);
+  else if (type === "remove")
+    removeFollowee(res, req.params.id, req.body.id);
+  else res.json({"Error":"Unrecognized type. Choose add or remove"});
 });
 
 //Validates user credentials for the Session Service

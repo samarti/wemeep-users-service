@@ -55,20 +55,12 @@ http://host:8080/users/{id}/followers
 ```
 http://host:8080/users/{id}/followees
 ```
-- Add a followee with `POST` at
+- Change following relation with `PUT`
 
 ```
 http://host:8080/users/{id}/followees
 
-Data: { body: { id:<someUserId> } }
-```
-
-- Remove a followee with `DELETE` at
-
-```
-http://host:8080/users/{id}/followees
-
-Data: { body: { id:<someUserId> } }
+Data: { body: { type:<"add" or "remove">, id:<followee id> } }
 ```
 - Login a User with `POST` at
 
