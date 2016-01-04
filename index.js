@@ -54,6 +54,11 @@ app.post('/users/', function(req, res){
     "gcmId":req.body.gcmId
   }
 
+  if(typeof data.username === "undefined" || typeof data.password === "undefined"){
+    res.json({"Error":"Missing fields."});
+    return;
+  }
+
   usersCollection.findOne( {username:req.body.username}, { fields:{"password":0, "salt":0} }, function(err, item) {
     if(item === null){
       usersCollection.findOne( {email:req.body.email}, { fields:{"password":0, "salt":0} }, function(err, item) {
