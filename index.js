@@ -49,14 +49,20 @@ app.post('/users/', function(req, res){
     "email": req.body.email,
     "password":req.body.password,
     "twitterId":req.body.twitterId ,
+    "twitterToken":req.body.twittertoken,
+    "twitterSecret":req.body.twittersecret,
     "facebookId":req.body.facebookId ,
     "picture": req.body.picture,
     "gcmId":req.body.gcmId
   }
 
-  if(typeof data.username === "undefined" || typeof data.password === "undefined"){
-    res.json({"Error":"Missing fields."});
+  if(typeof data.username === "undefined" || (typeof data.password === "undefined" && (typeof data.twitterToken === "undefined" && typeof data.twitterSecret === "undefined"))){
+    res.json({"Error":"Missing fields. Username && (password || (twittertoken && twitterSecret)) required"});
     return;
+  }
+
+  if(data.twitterToken !== "undefined"){
+    data.password = data.twitterToken;
   }
 
   usersCollection.findOne( {username:req.body.username}, { fields:{"password":0, "salt":0} }, function(err, item) {
