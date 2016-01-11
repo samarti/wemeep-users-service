@@ -100,6 +100,7 @@ Returns an array with the found users starting with <someString>
 | password | String |
 | twitterId | Number|
 | twitterToken | String |
+| twitterSecret | String |
 | facebookId | Number |
 | gcmId | String |
 | isPublic | Boolean |
