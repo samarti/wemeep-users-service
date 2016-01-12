@@ -53,23 +53,32 @@ app.post('/users/', function(req, res){
     "twitterSecret":req.body.twitterSecret,
     "facebookId":req.body.facebookId ,
     "picture": req.body.picture,
-    "gcmId":req.body.gcmId
+    "gcmId":req.body.gcmId,
+    "loginType": req.body.loginType
   }
 
-  if(typeof data.username === "undefined" || (typeof data.password === "undefined" && typeof data.twitterToken === "undefined" && typeof data.twitterSecret === "undefined")){
-    res.json({"Error":"Missing fields. Username && (password || (twittertoken && twitterSecret)) required"});
+  if(typeof data.loginType === "undefined" ||
+  typeof data.username === "undefined" ||
+  (typeof data.password === "undefined" && typeof data.twitterToken === "undefined" && typeof data.twitterSecret === "undefined")){
+    res.json({"Error":"Missing fields. Username && (password || (twittertoken && twitterSecret)) && loginType required"});
     return;
   }
 
+  var createFromTwitter = false;
   if(data.twitterToken !== "undefined"){
-    data.password = data.twitterToken;
+    createFromTwitter = true;
+  }
+
+  if(createFromTwitter){
+    twitterLoginHandle(res, data);
+    return;
   }
 
   usersCollection.findOne( {username:req.body.username}, { fields:{"password":0, "salt":0} }, function(err, item) {
     if(item === null){
       usersCollection.findOne( {email:req.body.email}, { fields:{"password":0, "salt":0} }, function(err, item) {
         if(item === null)
-          saveUser(res, data);
+          saveUser(res, data, createFromTwitter);
         else
           res.json({"Error":"Email exists"});
       });
@@ -118,13 +127,26 @@ app.post('/users/login', function(req, res){
   generateToken(res, req.body.username, req.body.password, req.body.deviceid);
 });
 
-function saveUser(res, data){
+function saveUser(res, data, createFromTwitter){
   var salt = bcrypt.genSaltSync(10);
+  var passHash;
+  var type;
+  if(!createFromTwitter){
+    passHash = hashPassword(salt, data["password"]);
+    type = "normal";
+  }
+  else {
+    type = "twitter";
+    passHash = ""
+  }
   usersCollection.bulkWrite( [ {insertOne : {document :{
                     "username":data["username"]
                   , "email":data["email"]
-                  , "password":hashPassword(salt, data["password"])
+                  , "password": passHash
+                  , "loginType": type
                   , "twitterId":data["twitterId"]
+                  , "twitterToken":data["twitterToken"]
+                  , "twitterSecret":data["twitterSecret"]
                   , "facebookId":data["facebookId"]
                   , "picture":data["picture"]
                   , "gcmId":data["gcmId"]
@@ -312,6 +334,16 @@ function generateToken(res, username, password, deviceid){
     }
   });
 }
+
+function twitterLoginHandle(res, data){
+  usersCollection.findOne( {twitterId:data.twitterId}, { fields:{"password":0, "salt":0} }, function(err, item) {
+    if(item === null)
+      saveUser(res, data, createFromTwitter);
+    else
+      res.json({"id":item.id});
+  });
+}
+
 
 function hashPassword(salt, password){
   var hash = bcrypt.hashSync(password, salt);
