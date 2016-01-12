@@ -70,6 +70,7 @@ app.post('/users/', function(req, res){
   }
 
   if(createFromTwitter){
+    console.log("to twitter");
     twitterLoginHandle(res, data);
     return;
   }
@@ -161,10 +162,11 @@ function saveUser(res, data, createFromTwitter){
 function getUser(res, id){
   try {
     var objID = ObjectID.createFromHexString(id);
-    usersCollection.findOne( {"_id":objID}, { fields:{"password":0, "salt":0, "followees": 0, "followers": 0} }, function(err, item) {
+    usersCollection.findOne({"_id":objID}, { fields:{"password":0, "salt":0, "followees": 0, "followers": 0} }, function(err, item) {
       if(item === null)
         res.json({"Error":"User not found"});
       else {
+        item = cleanObject(item);
         res.json(item);
       }
     });
@@ -337,13 +339,24 @@ function generateToken(res, username, password, deviceid){
 
 function twitterLoginHandle(res, data){
   usersCollection.findOne( {twitterId:data.twitterId}, { fields:{"password":0, "salt":0} }, function(err, item) {
-    if(item === null)
+    if(item === null){
       saveUser(res, data, createFromTwitter);
-    else
-      res.json({"id":item.id});
+          console.log("user null");
+    }
+    else{
+      res.json({"id":item._id});
+    }
   });
 }
 
+function cleanObject(object){
+  for (var i in object) {
+    if (object[i] === null || object[i] === undefined) {
+      delete object[i];
+    }
+  }
+  return object;
+}
 
 function hashPassword(salt, password){
   var hash = bcrypt.hashSync(password, salt);
