@@ -70,7 +70,6 @@ app.post('/users/', function(req, res){
   }
 
   if(createFromTwitter){
-    console.log("to twitter");
     twitterLoginHandle(res, data);
     return;
   }
@@ -79,7 +78,7 @@ app.post('/users/', function(req, res){
     if(item === null){
       usersCollection.findOne( {email:req.body.email}, { fields:{"password":0, "salt":0} }, function(err, item) {
         if(item === null)
-          saveUser(res, data, createFromTwitter);
+          saveUser(res, data, false);
         else
           res.json({"Error":"Email exists"});
       });
@@ -340,8 +339,7 @@ function generateToken(res, username, password, deviceid){
 function twitterLoginHandle(res, data){
   usersCollection.findOne( {twitterId:data.twitterId}, { fields:{"password":0, "salt":0} }, function(err, item) {
     if(item === null){
-      saveUser(res, data, createFromTwitter);
-          console.log("user null");
+      saveUser(res, data, true);
     }
     else{
       res.json({"id":item._id});
