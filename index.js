@@ -63,9 +63,8 @@ app.post('/users/', function(req, res){
     res.json({"Error":"Missing fields. Username && (password || (twittertoken && twitterSecret)) && loginType required"});
     return;
   }
-
   var createFromTwitter = false;
-  if(data.twitterToken !== "undefined"){
+  if(data.loginType === "twitter"){
     createFromTwitter = true;
   }
 
@@ -154,7 +153,7 @@ function saveUser(res, data, createFromTwitter){
                   , "followees":[]
                   , "followers":[]} } } ] ,
                   {ordered:true, w:1}, function(err, r) {
-    return res.json({"id":JSON.parse(JSON.stringify(r.insertedIds))['0']});
+                      res.json({"id":JSON.parse(JSON.stringify(r.insertedIds))['0']});
   });
 }
 
@@ -341,7 +340,7 @@ function twitterLoginHandle(res, data){
     if(item === null){
       saveUser(res, data, true);
     }
-    else{
+    else {
       res.json({"id":item._id});
     }
   });
