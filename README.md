@@ -97,7 +97,7 @@ Returns an array with the found users starting with <someString>
 | username  | String  |
 | email  | String  |
 | id  | String  |
-| loginType | "twitter" | "normal" |
+| loginType | "twitter" o "normal" |
 | password | String |
 | twitterId | Number|
 | twitterToken | String |
