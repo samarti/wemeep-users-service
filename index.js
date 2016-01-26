@@ -189,8 +189,10 @@ function searchUser(res, username){
   var ret = [];
   var i = 0;
   cursor.each(function(err, doc) {
-    if(i > 9)
+    if(i > 9){
+      res.json(JSON.parse(JSON.stringify(ret)));
       return;
+    }
 
     if (doc != null) {
        ret[i] = doc;
