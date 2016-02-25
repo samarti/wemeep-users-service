@@ -132,7 +132,7 @@ app.put('/users/:id', function(req, res){
   var data = {
     "picture": req.body.picture
   }
-  updateUser(res, data);
+  updateUser(res, data, req.params.id);
 });
 
 function updateUser(res, data, id){
@@ -143,7 +143,7 @@ function updateUser(res, data, id){
       res.json({"Error":"User not found"});
     else {
       usersCollection.updateOne(
-        {"_id": id},
+        {"_id": objID},
         { $set : data },
         function(err, results){
           if(err === null)
