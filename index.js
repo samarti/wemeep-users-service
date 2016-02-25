@@ -14,7 +14,7 @@ var fs = require('fs');
 var sessionServiceUrl = process.env.SESSION_SERVICE_URL;
 //var sessionServiceUrl = "http://ec2-54-233-116-227.sa-east-1.compute.amazonaws.com:4567/generatetoken"
 var url = 'mongodb://db:27017/local';
-//var url = 'mongodb://ec2-54-233-116-255.sa-east-1.compute.amazonaws.com:27017/local'
+//var url = 'mongodb://54.233.122.209:27017/local'
 var PORT = 8080;
 var theDb;
 var usersCollection;
@@ -132,18 +132,18 @@ app.put('/users/:id', function(req, res){
   var data = {
     "picture": req.body.picture
   }
+  console.log(req.body);
   updateUser(res, data, req.params.id);
 });
 
 function updateUser(res, data, id){
-
   var objID = ObjectID.createFromHexString(id);
   usersCollection.findOne({"_id":objID}, { fields:{"password":0, "salt":0, "followees": 0, "followers": 0} }, function(err, item) {
     if(item === null)
       res.json({"Error":"User not found"});
     else {
       usersCollection.updateOne(
-        {"_id": objID},
+        { "_id": objID },
         { $set : data },
         function(err, results){
           if(err === null)
