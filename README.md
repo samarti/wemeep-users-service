@@ -38,6 +38,13 @@ http://host:8080/users/{id}
 
 Returns the user data
 ```
+- Update a user with `PUT` at
+
+```
+http://host:8080/users/{id}
+Body: User Json
+Returns the { "Success":<Message> } or { "Error":<someError> }
+```
 - Delete a user with `DELETE` at
 
 ```

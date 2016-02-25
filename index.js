@@ -126,6 +126,37 @@ app.post('/users/login', function(req, res){
   generateToken(res, req.body.username, req.body.password, req.body.deviceid);
 });
 
+//Updates the updateables fields of a updateUser
+app.put('/users/:id', function(req, res){
+
+  var data = {
+    "picture": req.body.picture
+  }
+  updateUser(res, data);
+});
+
+function updateUser(res, data, id){
+
+  var objID = ObjectID.createFromHexString(id);
+  usersCollection.findOne({"_id":objID}, { fields:{"password":0, "salt":0, "followees": 0, "followers": 0} }, function(err, item) {
+    if(item === null)
+      res.json({"Error":"User not found"});
+    else {
+      usersCollection.updateOne(
+        {"_id": id},
+        { $set : data },
+        function(err, results){
+          if(err === null)
+            res.json({"Success":"User updated"});
+          else
+            res.json({"Error": err.toString()});
+          console.log(results);
+        }
+      );
+    }
+  });
+}
+
 function saveUser(res, data, createFromTwitter){
   var salt = bcrypt.genSaltSync(10);
   var passHash;
