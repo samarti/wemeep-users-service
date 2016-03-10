@@ -106,6 +106,15 @@ app.get('/users/:id/followees', function(req, res){
   getFollowees(res, req.params.id);
 });
 
+//Get a user stats
+app.get('/users/:id/statistics', function(req, res){
+  var expanded = require('url').parse(req.url,true).query.expanded;
+  if(typeof expanded === "undefined")
+    res.json({"Error": "expanded not defined. Please include it."});
+  else  
+    getStatistics(res, req.params.id, expanded == 'true');
+});
+
 //Update a following relation
 app.put('/users/:id/followees', function(req, res){
   var type = req.body.type;
@@ -261,6 +270,38 @@ function getFollowees(res, id){
     res.json({"Error":err.toString()});
   }
 }
+
+function getStatistics(res, id, expanded){
+  try {
+    var objID = ObjectID.createFromHexString(id);
+    usersCollection.findOne( {"_id":objID}, { fields:{ "followees":1 , "followers": 1} }, function(err, item) {
+      if(item === null)
+        res.json({"Error":"User not found"});
+      else {
+        var n = item.followees.length;
+        var j = item.followers.length;
+        if (expanded) {
+          var resData = {
+            "followees" :  item.followees,
+            "followers" : item.followers,
+            "numberOfFollowees": n,
+            "numberOfFollowers":j
+          };
+          res.json(resData);
+        } else {
+          var resData = {
+            "numberOfFollowees": n,
+            "numberOfFollowers":j
+          };
+          res.json(resData);
+        }
+      }
+    });
+  } catch (err){
+    res.json({"Error":err.toString()});
+  }
+}
+
 //Buscamos los usuarios y lo actualizamos. Tomaría menos tiempo si usáramos sólo findOneAndUpdate 2 veces en vez de buscarlos y luego hacer el update
 //Agregar restricción de qe no se repitan valores en los followers y followees
 function addFollowee(res, idUser, idFollowee){
