@@ -11,10 +11,15 @@ var querystring = require('querystring');
 var http = require('http');
 var fs = require('fs');
 
+/*
+var sessionServiceUrl = "http://ec2-54-233-116-227.sa-east-1.compute.amazonaws.com:4567/generatetoken";
+var meepServiceUrl = "http://54.232.209.214:4567/";
+var url = 'mongodb://54.233.122.209:27017/local';*/
+
+var meepServiceUrl = process.env.MEEP_SERVICE_URL;
 var sessionServiceUrl = process.env.SESSION_SERVICE_URL;
-//var sessionServiceUrl = "http://ec2-54-233-116-227.sa-east-1.compute.amazonaws.com:4567/generatetoken"
 var url = 'mongodb://db:27017/local';
-//var url = 'mongodb://54.233.122.209:27017/local'
+
 var PORT = 8080;
 var theDb;
 var usersCollection;
@@ -280,21 +285,32 @@ function getStatistics(res, id, expanded){
       else {
         var n = item.followees.length;
         var j = item.followers.length;
-        if (expanded) {
-          var resData = {
-            "followees" :  item.followees,
-            "followers" : item.followers,
-            "numberOfFollowees": n,
-            "numberOfFollowers":j
-          };
+
+        request({
+          uri: meepServiceUrl + "usermeeps/" + id + "?expanded=" + expanded,
+          method: "GET",
+          timeout: 10000,
+          followRedirect: true,
+          maxRedirects: 10
+        }, function(error, response, body) {
+          var resData = {};
+
+          if(error === null){
+            resData.numberOfMeeps = JSON.parse(response.body).numberOfMeeps;
+            resData.meepsIds = JSON.parse(response.body).meepsIds;
+          } else {
+            resData["error"] = error;
+          }
+          resData.numberOfFollowees = n;
+          resData.numberOfFollowers = j;
+
+          if (expanded) {
+              resData["followees"] =  item.followees;
+              resData["followers"] = item.followers;
+          } 
           res.json(resData);
-        } else {
-          var resData = {
-            "numberOfFollowees": n,
-            "numberOfFollowers":j
-          };
-          res.json(resData);
-        }
+
+        });
       }
     });
   } catch (err){
