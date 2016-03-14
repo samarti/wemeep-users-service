@@ -297,9 +297,10 @@ function getStatistics(res, id, expanded){
 
           if(error === null){
             resData.numberOfMeeps = JSON.parse(response.body).numberOfMeeps;
+            var meepsIdsArr = JSON.parse(response.body).meepsIds;
             var meepsIds = [];
-            for(var member of JSON.parse(response.body).meepsIds){
-              meepsIds.push(member.id);
+            for(var i = 0; i < meepsIdsArr.length; i++){
+              meepsIds.push(meepsIdsArr[i].id);
             }
             resData.meepsIds = meepsIds;
           
@@ -312,10 +313,10 @@ function getStatistics(res, id, expanded){
           if (expanded) {
             var followees = [];
             var followers = [];
-            for(var member of item.followees)
-              followees.push(member["_id"]);
-            for(var member of item.followers)
-              followers.push(member["_id"]);
+            for(var i = 0 ; i < item.followees.length ; i++)
+              followees.push(item.followees[i]["_id"]);
+            for(var i = 0 ; i < item.followers.length ; i++)
+              followers.push(item.followers[i]["_id"]);
             resData.followers = followers;
             resData.followees = followees;
           } 
