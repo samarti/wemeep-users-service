@@ -14,8 +14,8 @@ var fs = require('fs');
 /*
 var sessionServiceUrl = "http://ec2-54-233-116-227.sa-east-1.compute.amazonaws.com:4567/generatetoken";
 var meepServiceUrl = "http://54.232.209.214:4567/";
-var url = 'mongodb://54.233.122.209:27017/local';*/
-
+var url = 'mongodb://54.233.122.209:27017/local';
+*/
 var meepServiceUrl = process.env.MEEP_SERVICE_URL;
 var sessionServiceUrl = process.env.SESSION_SERVICE_URL;
 var url = 'mongodb://db:27017/local';
@@ -297,7 +297,12 @@ function getStatistics(res, id, expanded){
 
           if(error === null){
             resData.numberOfMeeps = JSON.parse(response.body).numberOfMeeps;
-            resData.meepsIds = JSON.parse(response.body).meepsIds;
+            var meepsIds = [];
+            for(var member of JSON.parse(response.body).meepsIds){
+              meepsIds.push(member.id);
+            }
+            resData.meepsIds = meepsIds;
+          
           } else {
             resData["error"] = error;
           }
@@ -305,8 +310,14 @@ function getStatistics(res, id, expanded){
           resData.numberOfFollowers = j;
 
           if (expanded) {
-              resData["followees"] =  item.followees;
-              resData["followers"] = item.followers;
+            var followees = [];
+            var followers = [];
+            for(var member of item.followees)
+              followees.push(member["_id"]);
+            for(var member of item.followers)
+              followers.push(member["_id"]);
+            resData.followers = followers;
+            resData.followees = followees;
           } 
           res.json(resData);
 
