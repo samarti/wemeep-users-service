@@ -88,6 +88,14 @@ Data: { body: { username:<someUsername>, email:<someEmail>, ... }}
 
 Returns true or false
 ```
+- Get a user stats with `GET`
+```
+http://host:8080/users/{id}/statistics?expanded=<true or false>
+
+Returns { numberOfMeeps:<some number>, numberOfFollowees:<some number>, numberOfFollowers:<some number> }
+
+If expanded, followers, followees and sent meeps id's are included as arrays
+```
 - Search for users starting with something with `GET`
 
 ```
