@@ -18,7 +18,7 @@ var url = 'mongodb://54.233.122.209:27017/local';
 */
 var meepServiceUrl = process.env.MEEP_SERVICE_URL;
 var sessionServiceUrl = process.env.SESSION_SERVICE_URL;
-var url = 'mongodb://db:27017/local';
+var url = 'mongodb://dbusers:27017/local';
 
 var PORT = 8080;
 var theDb;
